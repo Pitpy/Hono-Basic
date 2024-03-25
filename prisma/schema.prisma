@@ -1,0 +1,36 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model order_details {
+  order_id  Int     @default(autoincrement())
+  item_id   Int
+  item_text String  @db.VarChar
+  price     Decimal @db.Decimal(10, 2)
+
+  @@id([order_id, item_id])
+}
+
+model user {
+  id      Int     @id(map: "newtable_pk") @default(autoincrement())
+  name    String? @db.VarChar(120)
+  address Json?   @db.Json
+  phone   String? @db.VarChar(20)
+  arr     String?
+
+  @@map("users")
+}
+
+view v_users {
+  id      Int      @unique
+  name    String?  @db.VarChar(120)
+  address Json?    @db.Json
+  phone   String?  @db.VarChar(20)
+  arr     String[]
+}
