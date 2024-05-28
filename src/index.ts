@@ -12,21 +12,19 @@ const app = new Hono().use('*', cors()).use('*', logger((log) => {
 })).basePath('/api');
 
 app.get('/static/*', serveStatic({ root: './static', path: '/naruto.jpg' }))
+
 app.get('/naruto', serveStatic({ path: '/static/naruto.jpg' }))
+
 app.get('/stream/:name', (c) => stream(c, async (stream) => {
   return await stream.pipe(Bun.file('./static/' + c.req.param('name')).stream());
 }))
-app.get('/read', async (c) => {
-  const toml = await (Bun.file('./static/data.toml')).text()
-  console.log(toml);
-  return c.text(toml);
-})
+
 app.get('/write', async (c) => {
   const dog = await (await fetch('https://fastly.picsum.photos/id/776/200/300.jpg?grayscale&hmac=_jt47M077NR0udIuGImMjH4zvqZgLr_JAYJALqXoZqk')).blob()
   await Bun.write('./static/grayscale.jpg', dog)
   return c.redirect('/api/stream/grayscale.jpg')
 })
-app.get('/mode', (c) => c.text(Bun.env.NODE_ENV as string));
+
 app.get('/cache', cacheData('cache:1'), async (c) => {
   const data = { text: 'Caching data for this app ...' }
   await Bun.sleep(2000);
@@ -36,8 +34,10 @@ app.get('/cache', cacheData('cache:1'), async (c) => {
     data: data
   })
 });
+
 app.route('/user', user);
-app.notFound((c) => c.json({ message: 'Not found' }));
+
+app.notFound((c) => c.json({ message: 'ບໍ່ເຫັນເດີ້...' }));
 
 const server = {
   port: 3030,

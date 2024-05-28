@@ -9,25 +9,24 @@ import type { User } from "../../types";
 
 const user = new Hono();
 
-// user.get('/token', async (c) => {
-//     const cookieExpiration = 1000 * 60 * 60 * 24 * 365; // cookie expire in 1 year
-//     const token = await generateJwt({
-//         id: '11',
-//         name: 'John',
-//     })
-//     setCookie(c, 'token', token, {
-//         httpOnly: true,
-//         sameSite: 'Strict',
-//         maxAge: cookieExpiration
-//     })
-//     return c.json({ message: 'Token generated successfully' })
-// })
-// user.get('/name/:name',
-//     verifyToken,
-//     (c) => {
-//         return c.json({ message: `Hello ${c.req.param('name')}` })
-//     })
+user.get('/token', async (c) => {
+    const cookieExpiration = 1000 * 60 * 60 * 24 * 365; // cookie expire in 1 year
+    const token = await generateJwt({
+        id: '11',
+        name: 'John',
+    })
+    setCookie(c, 'token', token, {
+        httpOnly: true,
+        sameSite: 'Strict',
+        maxAge: cookieExpiration
+    })
+    return c.json({ message: 'Token generated successfully' })
+})
+user.get('/name/:name', verifyToken, (c) => {
+    return c.json({ message: `Hello ${c.req.param('name')}` })
+})
 
+//get users from databases
 user.get('/', async (c) => {
     const result = await sql<User[]>`
         select u.*, count(*) as cnt 
@@ -37,9 +36,21 @@ user.get('/', async (c) => {
     `
     return c.json({
         code: 10,
-        data: result.map(e => ({ ...e, arr: JSON.parse(e.arr) }))
+        data: result
     });
 })
+
+//get user by ID
+user.get('/:id', async (c) => {
+    const result = await sql<User[]>`
+        select * from users where id = ${c.req.param('id')} 
+    `
+    return c.json({
+        code: 10,
+        data: result
+    });
+})
+
 user.post('/', async (c) => {
     const form = await c.req.json()
     await sql`insert into users ${sql(form)}`;
