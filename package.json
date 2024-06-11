@@ -6,7 +6,7 @@
     "dev": "bun --watch ./src/index.ts",
     "build": "bun build ./src/index.ts ./src/routes/* ./src/middleware/* --outdir ./output --entry-naming [dir]/[name].[ext] --format esm --target bun",
     "preview": "bun run ./output/index.js",
-    "start": "pm2 start 'bun ./output/index.js' --name bun-api"
+    "start": "pm2 start --interpreter ~/.bun/bin/bun --name bun-api -i 5 ./output/index.js"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

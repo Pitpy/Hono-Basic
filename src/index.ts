@@ -42,6 +42,7 @@ app.notFound((c) => c.json({ message: 'ບໍ່ເຫັນເດີ້...' }))
 const server = {
   port: 3030,
   fetch: app.fetch,
+  reusePort: true,
 };
 
 if (Bun.env.NODE_ENV === 'production') console.log(`App started :: http://localhost:${server.port}`)
